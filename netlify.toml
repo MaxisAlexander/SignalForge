@@ -1,0 +1,8 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+# Essential Next.js plugin is auto-installed by Netlify, 
+# but explicitly declaring it ensures the correct serverless functions are generated.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
