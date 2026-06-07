@@ -1,150 +1,107 @@
 # SignalForge
 
-Agentic **research → execution** for the [SoSoValue Buildathon](https://app.akindo.io/wave-hacks/JBEQXgN4Zi2jA3wA) on AKINDO WaveHack.
+SignalForge is an agentic **research-to-execution** workflow application built for the **SoSoValue Buildathon** on AKINDO WaveHack.
 
-**Landing:** `/` · **Workflow app:** `/app`
+Most trading tools stop at charts and data feeds. SignalForge closes the loop: **Scan -> Analyze -> Signal -> Match**.
 
 ---
 
 ## What is SignalForge?
 
-SignalForge ingests live [SoSoValue Open API](https://openapi.sosovalue.com/openapi/v1) data, runs a verification gate on every signal, and outputs **Spot** and **Futures** trade plans you can match and execute on [SoDEX testnet](https://testnet.sodex.com).
-
-Most tools stop at charts. SignalForge closes the loop: **Scan → Analyze → Signal → Match**.
+SignalForge ingests real-time macro indicators from the **SoSoValue Open API**, validates them through strict verification gates, structures precise risk-calibrated spot and futures trade plans, and allows users to match and execute those plans directly on the **SoDEX exchange testnet**.
 
 ---
 
-## Workflow
+## Core Workflow
 
-| Step | Name | What happens |
-|------|------|----------------|
-| **1** | **Scan** | Hot news, sector spotlight, BTC ETF flows, SSI index snapshots (rate-limited, cached) |
-| **2** | **Analyze** | Fuse ETF, sentiment, sector rotation, and index momentum for your focus preset |
-| **3** | **Signal** | **Verified** signals only — **Spot** (left) and **Futures** (right); pick one card |
-| **4** | **Match** | Shows the **exact** plan from your selected card (amount, price USDC, TP/SL) + open on testnet |
-
-### Signal verification (no random outputs)
-
-Signals are emitted only when live data passes all checks, for example:
-
-- ETF: flow ≥ $5M, dated snapshot, 2-day direction when available  
-- Sector: ≥4 sectors, leader/laggard spread ≥ 1.5%, SSI mapping  
-- News: ≥3 tagged headlines, score ≥ ±3, tone matches direction  
-- Index: live price, 24h move ≥ 0.5%  
-
-Confidence is computed from the underlying metrics, not fixed placeholders.
-
-### Futures plan fields
-
-- Cross / Isolated · Leverage 1x–25x · Buy-Long / Sell-Short  
-- Limit order · Amount (BTC or USDC) · Price (USDC)  
-- Take profit & stop loss (% + USD price) · Reduce only yes/no  
+| Step | Phase | Functionality |
+|------|-------|---------------|
+| **1** | **Scan** | Pulls sector spotlights, hot headlines, sentiment indexes (SSI snapshots), and US BTC ETF flows. |
+| **2** | **Analyze** | Runs preset focus engines (AI, DeFi, BTC Macro, Risk-Off) to compute sentiment trends. |
+| **3** | **Signal** | Filters results through strict verification gates to emit verified Spot and Futures trade plans. |
+| **4** | **Match** | Configures leverage, entry levels, and TP/SL boundaries, deep-linking directly to SoDEX testnet. |
 
 ---
 
-## SoSoValue APIs used
+## Signal Verification Gates
 
-| Module | Endpoints |
-|--------|-----------|
-| Feeds | `/news/hot`, `/news/featured` |
-| Currency | `/currencies/sector-spotlight` |
-| SoSoValue Index | `/indices/{ticker}/market-snapshot` |
-| ETF | `/etfs/summary-history` (BTC, US) |
+To eliminate low-confidence noise, signals are only generated when incoming data passes all verification checks:
 
-Auth: header `x-soso-api-key` · Base: `https://openapi.sosovalue.com/openapi/v1`
+* **ETF Flow Gate**: Flow magnitude must be greater than or equal to 5 million USD with consistent 2-day flow direction.
+* **Sector Rotation Gate**: At least 4 sectors must load, with leader-laggard spread greater than or equal to 1.5 percent.
+* **News Sentiment Gate**: At least 3 tagged headlines, with sentiment score greater than or equal to 3 or less than or equal to -3.
+* **SSI Index Gate**: Mapped leader must show 24h change greater than or equal to 0.5 percent.
+* **Price Drift Gate**: Live spot prices (fetched from CoinGecko + Binance) must not drift from plan entry prices by more than 1.5 percent.
 
 ---
 
-## Quick start
+## Roadmap & Wave Updates
 
+### Wave 2 (Completed)
+* **Core Workflow Engine**: Built and integrated the full 4-step wizard UI.
+* **API Ingestion & Caching**: Live feeds from SoSoValue and dual-source price feeds (CoinGecko + Binance) with client-side rate protection.
+* **Sizing Calculators**: Automatic calculation of leverage caps and trade sizes proportional to mock account balances.
+* **Netlify Deployment Integration**: Configured `netlify.toml` and patched Next.js dependencies to version 15.5.19 to bypass CVE-2025-55182 deployment blocks.
+
+### Wave 3 (Planned)
+* **Direct Web3 Execution**: Integrate Viem and browser wallet extensions (MetaMask/Rainbow) to sign and execute trades directly on SoDEX contracts.
+* **On-Chain Balance Sync**: Sync live token balances directly from the ValueChain testnet.
+
+### Wave 4 (Planned)
+* **Custom Gate Rules**: Allow traders to adjust validation thresholds (e.g. minimum flows, leverage limits) from the UI.
+* **Index Rebalancing**: Enable direct SSI index swapping and portfolio rebalancing on-chain.
+
+---
+
+## Quick Start
+
+### Prerequisites
+* Node.js v18 or later
+* SoSoValue API Key (Get one at [sosovalue.com/developer/dashboard](https://sosovalue.com/developer/dashboard))
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/MaxisAlexander/SignalForge.git
+   cd SignalForge
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Setup environment variables:
+   Create a `.env.local` file in the root directory:
+   ```env
+   SOSO_API_KEY=your_sosovalue_api_key_here
+   ```
+
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) for the landing page or [http://localhost:3000/app](http://localhost:3000/app) for the application.
+
+---
+
+## Development on Windows (Port and Cache Solver)
+
+If you experience compilation issues, port conflicts, or corrupt cache states on Windows:
 ```bash
-cd signalforge
-cp .env.example .env.local
-# SOSO_API_KEY from https://sosovalue.com/developer/dashboard
-npm install
-npm run dev
-```
-
-Open http://localhost:3000 (landing) → http://localhost:3000/app (workflow).
-
-### Environment
-
-```env
-SOSO_API_KEY=your_key_here
-```
-
-Never commit `.env.local`.
-
-### Dev on Windows (500 on `react-refresh.js` / `_app.js`)
-
-This means a **corrupt `.next` cache** or **two dev servers** fighting on port 3000.
-
-```bash
-# Stop all terminals running npm run dev, then:
+# Clean cache, free local ports 3000-3002, and start dev server:
 npm run fix
 npm run dev:fast
 ```
-
-Or one command: `npm run dev` (cleans `.next` first).
-
-Hard refresh: **Ctrl+Shift+R** · use only **http://localhost:3000** · one dev process only.
-
-Server log may show `Cannot find module './638.js'` — same fix: `npm run fix` and restart.
-
----
-
-## Project structure
-
-```
-src/
-  app/
-    page.tsx              # Landing (Buildathon hero + workflow carousel)
-    app/page.tsx          # Scan → Analyze → Signal → Match
-    api/pulse/            # SoSoValue ingest + cache
-    api/analyze/          # Verified signal engine
-    api/testnet/          # SoDEX testnet proxy (symbol, account)
-  components/
-    WorkflowCarousel.tsx  # Landing step preview
-    SignalMarketColumn.tsx # Spot / Futures signal columns
-    MatchPanel.tsx        # Selected card → match view
-  lib/
-    signal-engine.ts      # Data-backed signals + verification
-    signal-plans.ts       # Spot & futures plan builders
-    signal-verify.ts      # Verification gates
-    sosovalue.ts          # API client
-public/
-  icon.svg, apple-icon.svg  # Brand favicon (amber → cyan signal line)
-vercel.json
+Or execute the all-in-one command:
+```bash
+npm run dev
 ```
 
 ---
 
-## Deploy (Vercel)
-
-1. Push to GitHub  
-2. Import project in [Vercel](https://vercel.com) (Next.js auto-detected; `vercel.json` included)  
-3. Environment variable: **`SOSO_API_KEY`**  
-4. Deploy · submit demo URL on [AKINDO](https://app.akindo.io/wave-hacks/JBEQXgN4Zi2jA3wA)
-
----
-
-## AKINDO demo script
-
-1. Landing → **Launch app**  
-2. **Scan** → **Analyze** (pick focus preset)  
-3. **Signal** → select one **Spot** or **Futures** card  
-4. **Match** → confirm plan matches the card → **Open on SoDEX testnet**  
-
----
-
-## Links
-
-- [Buildathon](https://app.akindo.io/wave-hacks/JBEQXgN4Zi2jA3wA)
-- [SoSoValue API Docs](https://sosovalue.gitbook.io/soso-value-api-doc/)
-- [API key dashboard](https://sosovalue.com/developer/dashboard)
-- [SSI Protocol](https://ssi.sosovalue.com/)
-- [SoDEX testnet](https://testnet.sodex.com/)
-
----
-
-Built for AKINDO WaveHack · SoSoValue Buildathon · Data via [openapi.sosovalue.com](https://openapi.sosovalue.com/openapi/v1)
+## Tech Stack
+* **Framework**: Next.js 15 (App Router), React 19, TypeScript
+* **Styling**: Tailwind CSS
+* **Web3 Utilities**: Viem
+* **APIs**: SoSoValue Open API, SoDEX Testnet API
