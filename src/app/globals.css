@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #070b12;
+  --surface: #0f1623;
+  --surface-2: #151e2e;
+  --border: #243044;
+  --text: #e8edf5;
+  --muted: #8b9bb8;
+  --accent: #f59e0b;
+  --accent-2: #22d3ee;
+  --bull: #34d399;
+  --bear: #f87171;
+  --watch: #a78bfa;
+}
+
+body {
+  color: var(--text);
+  background: var(--bg);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.glass {
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 85%, transparent);
+  backdrop-filter: blur(12px);
+}

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <rect width="180" height="180" rx="40" fill="#070b12"/>
+  <rect x="2" y="2" width="176" height="176" rx="38" stroke="url(#ring)" stroke-width="3" stroke-opacity="0.35"/>
+  <defs>
+    <linearGradient id="ring" x1="0" y1="0" x2="180" y2="180">
+      <stop stop-color="#f59e0b"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="pulse" x1="30" y1="130" x2="150" y2="50">
+      <stop stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <text x="90" y="72" text-anchor="middle" fill="url(#pulse)" font-family="system-ui,sans-serif" font-size="48" font-weight="700">SF</text>
+  <path d="M28 128 L52 92 L76 108 L100 72 L124 88 L152 56" stroke="url(#pulse)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="152" cy="56" r="12" fill="#22d3ee"/>
+</svg>
